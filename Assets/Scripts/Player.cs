@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkedVar;
 
 public class Player : NetworkedBehaviour
 {
-    public string username = "joe";
+    public string username;
     public GameObject bulletPrefab;
     public float movementSpeed = 5f;
     private Transform handPivot;
@@ -19,11 +20,15 @@ public class Player : NetworkedBehaviour
     private float bulletSpeed = 15f;
     private float gunCD = 0.5f;
     private float gunCDElapsed = 0f;
+    private UIManager ui;
+
+    private float handRotation = 180;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         handPivot = transform.Find("Hand Pivot");
         hand = handPivot.Find("Hand");
+        ui = GameObject.Find("Canvas").GetComponent<UIManager>();
 
         if (IsLocalPlayer)
         {
@@ -81,21 +86,30 @@ public class Player : NetworkedBehaviour
     }
     void PointTowardsCursor()
     {
+        hand.localRotation = Quaternion.Euler(0, handRotation, 90);
+        if (transform.position.x > mousePosition.x)
+            handRotation = 180;
+        else
+            handRotation = 0;
+
         if (!IsLocalPlayer) return;
         mousePosition = Input.mousePosition;
         mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
         direction = new Vector2(mousePosition.x - transform.position.x, mousePosition.y - transform.position.y);
         handPivot.up = direction;
-
-        if (transform.position.x > mousePosition.x)
-            hand.localScale = new Vector3(1, -1, 1);
-        else
-            hand.localScale = new Vector3(1, 1, 1);
     }
     void Move()
     {
         if (!IsLocalPlayer) return;
         float timeScaler = Time.deltaTime * 100;
         rb.velocity = new Vector2(haxis * movementSpeed * timeScaler, vaxis * movementSpeed * timeScaler);
+    }
+    
+    void OnCollisionEnter2D(Collision2D other) {
+        if (other.gameObject.tag == "Bullet") {
+            Bullet b = other.gameObject.GetComponent<Bullet>();
+            // InvokeServerRpc(ui.AddPoint, b.ownerName);
+            Destroy(other.gameObject);
+        }
     }
 }

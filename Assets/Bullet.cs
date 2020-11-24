@@ -5,6 +5,7 @@ using MLAPI;
 public class Bullet : NetworkedBehaviour
 {
     float lifeSpan = 5;
+    public string ownerName;
     void Start()
     {
         
@@ -20,10 +21,6 @@ public class Bullet : NetworkedBehaviour
     }
     public void Fired(string ownerName, float speed, Vector3 direction) {
         GetComponent<Rigidbody2D>().velocity = direction*speed;
-    }
-    void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag == "Player") {
-            Destroy(gameObject);
-        }
+        this.ownerName = ownerName;
     }
 }

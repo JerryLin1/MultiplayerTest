@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
+using MLAPI.Messaging;
 
 public class Player : NetworkedBehaviour
 {
@@ -42,6 +43,20 @@ public class Player : NetworkedBehaviour
     }
     void MoveInput()
     {
+        // if (rb.velocity.x > 0.1 && transform.rotation.z >= -20)
+        // {
+        //     float z = transform.rotation.z;
+        //     transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, z - 5, transform.rotation.w);
+        // }
+        // else if (rb.velocity.x < -0.1 && transform.rotation.z <= 20)
+        // {
+        //     float z = transform.rotation.z;
+        //     transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, z + 5, transform.rotation.w);
+        // }
+        // else if (transform.rotation)
+        // {
+
+        // }
         if (!IsLocalPlayer) return;
 
         haxis = Input.GetAxisRaw("Horizontal");
@@ -50,27 +65,32 @@ public class Player : NetworkedBehaviour
         // fire gun
         if (Input.GetMouseButtonDown(0) && gunCDElapsed <= 0f)
         {
-            GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
-            IbulletPrefab.GetComponent<NetworkedObject>().Spawn();
-            IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
+            Vector3 d = direction;
+            InvokeServerRpc(SpawnBullet, username, bulletSpeed, d.normalized);
             gunCDElapsed = gunCD;
         }
         gunCDElapsed -= Time.deltaTime;
     }
+
     [ServerRPC]
-    void MyMethod(int myInt)
+    void SpawnBullet(string username, float bulletSpeed, Vector3 direction)
     {
-
+        GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
+        IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
+        IbulletPrefab.GetComponent<NetworkedObject>().Spawn();
     }
-
     void PointTowardsCursor()
     {
         if (!IsLocalPlayer) return;
         mousePosition = Input.mousePosition;
         mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
         direction = new Vector2(mousePosition.x - transform.position.x, mousePosition.y - transform.position.y);
-        handPivot.localScale = (mousePosition.x > transform.position.x) ? new Vector3(1, 1, 1) : new Vector3(-1, 1, 1);
         handPivot.up = direction;
+
+        if (transform.position.x > mousePosition.x)
+            hand.localScale = new Vector3(1, -1, 1);
+        else
+            hand.localScale = new Vector3(1, 1, 1);
     }
     void Move()
     {

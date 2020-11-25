@@ -14,15 +14,16 @@ public class Player : NetworkedBehaviour
     private Transform hand;
     private Rigidbody2D rb;
     private Vector2 direction;
-    private Vector3 mousePosition;
+    private Vector3 playerMousePos;
     private float haxis;
     private float vaxis;
     private float bulletSpeed = 15f;
     private float gunCD = 0.5f;
     private float gunCDElapsed = 0f;
     private UIManager ui;
-
-    private float handRotation = 180;
+    [HideInInspector]
+    public NetworkedVarInt playerScore = new NetworkedVarInt(new NetworkedVarSettings {WritePermission = NetworkedVarPermission.Everyone}, 0);
+    private NetworkedVarFloat handRotation = new NetworkedVarFloat(new NetworkedVarSettings {WritePermission = NetworkedVarPermission.OwnerOnly}, 180);
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -72,6 +73,7 @@ public class Player : NetworkedBehaviour
         {
             Vector3 d = direction;
             InvokeServerRpc(SpawnBullet, username, bulletSpeed, d.normalized);
+            SpawnBulletClient(username, bulletSpeed, d.normalized);
             gunCDElapsed = gunCD;
         }
         gunCDElapsed -= Time.deltaTime;
@@ -82,21 +84,30 @@ public class Player : NetworkedBehaviour
     {
         GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
         IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
-        IbulletPrefab.GetComponent<NetworkedObject>().Spawn();
+        InvokeClientRpcOnEveryoneExcept(SpawnBulletClient, OwnerClientId, username, bulletSpeed, direction.normalized);
+    }
+    // wtf is this this is not right bro
+    [ClientRPC]
+    void SpawnBulletClient(string username, float bulletSpeed, Vector3 direction) {
+        GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
+        IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
     }
     void PointTowardsCursor()
     {
-        hand.localRotation = Quaternion.Euler(0, handRotation, 90);
-        if (transform.position.x > mousePosition.x)
-            handRotation = 180;
-        else
-            handRotation = 0;
-
+        hand.localRotation = Quaternion.Euler(0, handRotation.Value, 90);
         if (!IsLocalPlayer) return;
-        mousePosition = Input.mousePosition;
-        mousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-        direction = new Vector2(mousePosition.x - transform.position.x, mousePosition.y - transform.position.y);
+        playerMousePos = Input.mousePosition;
+        playerMousePos = Camera.main.ScreenToWorldPoint(playerMousePos);
+        direction = new Vector2(playerMousePos.x - transform.position.x, playerMousePos.y - transform.position.y);
         handPivot.up = direction;
+        if (transform.position.x > playerMousePos.x)
+        {
+            handRotation.Value = 180;
+        }
+        else 
+        {
+            handRotation.Value = 0;
+        }
     }
     void Move()
     {
@@ -104,9 +115,11 @@ public class Player : NetworkedBehaviour
         float timeScaler = Time.deltaTime * 100;
         rb.velocity = new Vector2(haxis * movementSpeed * timeScaler, vaxis * movementSpeed * timeScaler);
     }
-    
-    void OnCollisionEnter2D(Collision2D other) {
-        if (other.gameObject.tag == "Bullet") {
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Bullet")
+        {
             Bullet b = other.gameObject.GetComponent<Bullet>();
             // InvokeServerRpc(ui.AddPoint, b.ownerName);
             Destroy(other.gameObject);

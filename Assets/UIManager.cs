@@ -6,15 +6,15 @@ using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkedVar.Collections;
 using MLAPI.Spawning;
+using MLAPI.Connection;
 
 public class UIManager : NetworkedBehaviour
 {
-    // public NetworkedDictionary<string, int> scores = new NetworkedDictionary<string, int>();
     private Transform scoreboard;
     private void Start()
     {
-        // scoreboard = transform.Find("Scoreboard");
-        // scoreboard.gameObject.SetActive(false);
+        scoreboard = transform.Find("Scoreboard");
+        scoreboard.gameObject.SetActive(false);
     }
     public void StartHost()
     {
@@ -24,6 +24,7 @@ public class UIManager : NetworkedBehaviour
     public void StartClient()
     {
         NetworkingManager.Singleton.StartClient();
+        // NetworkingManager.Singleton.ConnectionApprovalCallback+=( connectionData, clientId, connApprovalDel )=>StartGame();
         StartGame();
     }
     void StartGame()
@@ -31,8 +32,7 @@ public class UIManager : NetworkedBehaviour
         GetName();
         DisableButtons();
         ActivateCrosshair();
-        // scoreboard.gameObject.SetActive(true);
-        // UpdateScoreboard();
+        scoreboard.gameObject.SetActive(true);
     }
     void DisableButtons()
     {
@@ -47,26 +47,7 @@ public class UIManager : NetworkedBehaviour
     {
         string username = gameObject.transform.Find("Buttons").Find("Name").GetComponent<InputField>().text;
         if (username == "") username = "Player " + NetworkingManager.Singleton.LocalClientId.ToString();
+        // SpawnManager.GetLocalPlayerObject().name = username;
+		// SpawnManager.GetLocalPlayerObject().GetComponent<Player>().username = username;
     }
-
-    // [ServerRPC]
-    // public void AddPoint(string name)
-    // {
-    //     if (!IsServer) return;
-    //     int outvalue;
-    //     if (scores.TryGetValue(name, out outvalue))
-    //     {
-    //         scores[name] = outvalue + 1;
-    //     }
-    //     UpdateScoreboard();
-    // }
-    // void UpdateScoreboard()
-    // {
-    //     string scoreText = "";
-    //     foreach (KeyValuePair<string, int> entry in scores)
-    //     {
-    //         scoreText = entry.Key + ": " + entry.Value + "\n";
-    //     }
-    //     scoreboard.GetComponentInChildren<Text>().text = scoreText;
-    // }
 }

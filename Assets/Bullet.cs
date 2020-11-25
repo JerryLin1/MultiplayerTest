@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAPI;
-public class Bullet : NetworkedBehaviour
+public class Bullet : MonoBehaviour
 {
     float lifeSpan = 5;
     public string ownerName;

@@ -211,10 +211,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a3fe6d5df3fd4f4eb5beabf086922a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  username: joe
+  username: 
   bulletPrefab: {fileID: 8432216660474627141, guid: 57106a1f515fcd44aaa4134a962a6469,
     type: 3}
   movementSpeed: 5
+  playerScore:
+    InternalValue: 0
 --- !u!212 &6441419794475810555
 SpriteRenderer:
   m_ObjectHideFlags: 0

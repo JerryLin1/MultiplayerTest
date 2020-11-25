@@ -211,7 +211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a3fe6d5df3fd4f4eb5beabf086922a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  username: 
+  username:
+    InternalValue: 
   bulletPrefab: {fileID: 8432216660474627141, guid: 57106a1f515fcd44aaa4134a962a6469,
     type: 3}
   movementSpeed: 5
@@ -344,7 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: -410691123, guid: 01701b64234b4d523d8045142cbc73fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FixedSendsPerSecond: 20
+  FixedSendsPerSecond: 40
   AssumeSyncedSends: 1
   InterpolatePosition: 1
   SnapDistance: 2

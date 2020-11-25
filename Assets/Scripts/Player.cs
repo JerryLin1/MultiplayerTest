@@ -4,10 +4,12 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
+using MLAPI.Spawning;
+using DG.Tweening;
 
 public class Player : NetworkedBehaviour
 {
-    public string username;
+    public NetworkedVarString username = new NetworkedVarString(nvsOwner);
     public GameObject bulletPrefab;
     public float movementSpeed = 5f;
     private Transform handPivot;
@@ -15,15 +17,17 @@ public class Player : NetworkedBehaviour
     private Rigidbody2D rb;
     private Vector2 direction;
     private Vector3 playerMousePos;
-    private float haxis;
+    private static NetworkedVarSettings nvsOwner = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.OwnerOnly};
+    private static NetworkedVarSettings nvsEveryone = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone};
+    private NetworkedVarFloat haxis = new NetworkedVarFloat(nvsOwner);
     private float vaxis;
-    private float bulletSpeed = 15f;
+    private float bulletSpeed = 30f;
     private float gunCD = 0.5f;
     private float gunCDElapsed = 0f;
     private UIManager ui;
     [HideInInspector]
-    public NetworkedVarInt playerScore = new NetworkedVarInt(new NetworkedVarSettings {WritePermission = NetworkedVarPermission.Everyone}, 0);
-    private NetworkedVarFloat handRotation = new NetworkedVarFloat(new NetworkedVarSettings {WritePermission = NetworkedVarPermission.OwnerOnly}, 180);
+    public NetworkedVarInt playerScore = new NetworkedVarInt(nvsEveryone, 0);
+    private NetworkedVarFloat handRotation = new NetworkedVarFloat(nvsOwner, 180);
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -49,31 +53,17 @@ public class Player : NetworkedBehaviour
     }
     void MoveInput()
     {
-        // if (rb.velocity.x > 0.1 && transform.rotation.z >= -20)
-        // {
-        //     float z = transform.rotation.z;
-        //     transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, z - 5, transform.rotation.w);
-        // }
-        // else if (rb.velocity.x < -0.1 && transform.rotation.z <= 20)
-        // {
-        //     float z = transform.rotation.z;
-        //     transform.rotation = new Quaternion(transform.rotation.x, transform.rotation.y, z + 5, transform.rotation.w);
-        // }
-        // else if (transform.rotation)
-        // {
-
-        // }
         if (!IsLocalPlayer) return;
 
-        haxis = Input.GetAxisRaw("Horizontal");
+        haxis.Value = Input.GetAxisRaw("Horizontal");
         vaxis = Input.GetAxisRaw("Vertical");
 
         // fire gun
         if (Input.GetMouseButtonDown(0) && gunCDElapsed <= 0f)
         {
             Vector3 d = direction;
-            InvokeServerRpc(SpawnBullet, username, bulletSpeed, d.normalized);
-            SpawnBulletClient(username, bulletSpeed, d.normalized);
+            InvokeServerRpc(SpawnBullet, username.Value, bulletSpeed, d.normalized);
+            SpawnBulletClient(username.Value, bulletSpeed, d.normalized);
             gunCDElapsed = gunCD;
         }
         gunCDElapsed -= Time.deltaTime;
@@ -88,7 +78,8 @@ public class Player : NetworkedBehaviour
     }
     // wtf is this this is not right bro
     [ClientRPC]
-    void SpawnBulletClient(string username, float bulletSpeed, Vector3 direction) {
+    void SpawnBulletClient(string username, float bulletSpeed, Vector3 direction)
+    {
         GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
         IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
     }
@@ -104,25 +95,42 @@ public class Player : NetworkedBehaviour
         {
             handRotation.Value = 180;
         }
-        else 
+        else
         {
             handRotation.Value = 0;
         }
     }
+    void RotateWhenMoving()
+    {
+        if (haxis.Value > 0.1 && transform.rotation.z >= -0.2)
+        {
+            transform.DORotate(new Vector3(0, 0, -30), 1);
+        }
+        else if (haxis.Value < -0.1 && transform.rotation.z <= 0.2)
+        {
+            transform.DORotate(new Vector3(0, 0, 30), 1);
+        }
+        else
+        {
+            transform.DORotate(new Vector3(0, 0, 0), 1);
+        }
+    }
     void Move()
     {
+        RotateWhenMoving();
         if (!IsLocalPlayer) return;
         float timeScaler = Time.deltaTime * 100;
-        rb.velocity = new Vector2(haxis * movementSpeed * timeScaler, vaxis * movementSpeed * timeScaler);
+        rb.velocity = new Vector2(haxis.Value * movementSpeed * timeScaler, vaxis * movementSpeed * timeScaler);
     }
 
     void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "Bullet")
         {
-            Bullet b = other.gameObject.GetComponent<Bullet>();
-            // InvokeServerRpc(ui.AddPoint, b.ownerName);
             Destroy(other.gameObject);
+            if (!IsHost) return;
+            Bullet b = other.gameObject.GetComponent<Bullet>();
+            ui.InvokeServerRpc(ui.AddPoint, b.ownerName);
         }
     }
 }

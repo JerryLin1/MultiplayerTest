@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class Bullet : MonoBehaviour
 {
-    float lifeSpan = 5;
+    float lifeSpan = 2;
     public string ownerName;
     void Start()
     {

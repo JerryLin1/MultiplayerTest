@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
@@ -51,7 +52,7 @@ public class UIManager : NetworkedBehaviour
     }
     void InitiatePlayer(ulong clientId)
     {
-        string username = gameObject.transform.Find("Buttons").Find("Name").GetComponent<InputField>().text;
+        string username = gameObject.transform.Find("Buttons").Find("Name").GetComponent<TMP_InputField>().text;
         if (username == "") username = "Player " + NetworkingManager.Singleton.LocalClientId.ToString();
         ScoreTracker.Add(username, 0);
         SpawnManager.GetPlayerObject(clientId).name = username;
@@ -72,18 +73,18 @@ public class UIManager : NetworkedBehaviour
     [ServerRPC(RequireOwnership = false)]
     public void UpdateScoreboard()
     {
-        string sct = "";
+        string sct = "<color=black>";
         foreach (KeyValuePair<string, int> entry in ScoreTracker)
         {
             sct += entry.Key + ": " + entry.Value + "\n";
         }
-        scoreboard.GetComponentInChildren<Text>().text = sct;
+        scoreboard.GetComponentInChildren<TextMeshProUGUI>().text = sct;
         InvokeClientRpcOnEveryone(UpdateScoreboardClient, sct);
     }
     //cringe way to do it but i lazy
     [ClientRPC]
     void UpdateScoreboardClient(string scoreboardText)
     {
-        scoreboard.GetComponentInChildren<Text>().text = scoreboardText;
+        scoreboard.GetComponentInChildren<TextMeshProUGUI>().text = scoreboardText;
     }
 }

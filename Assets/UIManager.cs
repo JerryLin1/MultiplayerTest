@@ -9,6 +9,7 @@ using MLAPI.NetworkedVar;
 using MLAPI.NetworkedVar.Collections;
 using MLAPI.Spawning;
 using MLAPI.Connection;
+using Steamworks;
 
 public class UIManager : NetworkedBehaviour
 {
@@ -29,6 +30,9 @@ public class UIManager : NetworkedBehaviour
     }
     public void StartClient()
     {
+        string idstring = gameObject.transform.Find("Buttons").Find("SteamID").GetComponent<TMP_InputField>().text;
+        SteamP2PTransport.SteamP2PTransport steamTransport = GameObject.Find("Network").GetComponent<SteamP2PTransport.SteamP2PTransport>();
+        if (steamTransport != null) steamTransport.ConnectToSteamID = ulong.Parse(idstring);
         NetworkingManager.Singleton.StartClient();
         StartGame();
     }
@@ -62,7 +66,6 @@ public class UIManager : NetworkedBehaviour
     [ServerRPC(RequireOwnership = false)]
     public void AddPoint(string name)
     {
-        Debug.Log("poo");
         int points;
         if (ScoreTracker.TryGetValue(name, out points))
         {

@@ -22,4 +22,8 @@ public class Bullet : MonoBehaviour
         GetComponent<Rigidbody2D>().velocity = direction*speed;
         this.ownerName = ownerName;
     }
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        Destroy(gameObject);
+    }
 }

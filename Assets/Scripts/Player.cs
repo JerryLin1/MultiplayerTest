@@ -63,7 +63,6 @@ public class Player : NetworkedBehaviour
         {
             Vector3 d = direction;
             InvokeServerRpc(SpawnBullet, username.Value, bulletSpeed, d.normalized);
-            SpawnBulletClient(username.Value, bulletSpeed, d.normalized);
             gunCDElapsed = gunCD;
         }
         gunCDElapsed -= Time.deltaTime;
@@ -72,9 +71,9 @@ public class Player : NetworkedBehaviour
     [ServerRPC]
     void SpawnBullet(string username, float bulletSpeed, Vector3 direction)
     {
-        GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
-        IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
-        InvokeClientRpcOnEveryoneExcept(SpawnBulletClient, OwnerClientId, username, bulletSpeed, direction.normalized);
+        // GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
+        // IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
+        InvokeClientRpcOnEveryone(SpawnBulletClient, username, bulletSpeed, direction.normalized);
     }
     // wtf is this this is not right bro
     [ClientRPC]
@@ -127,7 +126,6 @@ public class Player : NetworkedBehaviour
     {
         if (other.gameObject.tag == "Bullet")
         {
-            Destroy(other.gameObject);
             if (!IsHost) return;
             Bullet b = other.gameObject.GetComponent<Bullet>();
             ui.InvokeServerRpc(ui.AddPoint, b.ownerName);

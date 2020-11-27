@@ -126,10 +126,10 @@ MonoBehaviour:
   m_Script: {fileID: -410691123, guid: 01701b64234b4d523d8045142cbc73fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FixedSendsPerSecond: 20
+  FixedSendsPerSecond: 120
   AssumeSyncedSends: 1
   InterpolatePosition: 1
-  SnapDistance: 10
+  SnapDistance: 0.1
   InterpolateServer: 1
   MinMeters: 0.15
   MinDegrees: 1.5
@@ -293,7 +293,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!50 &6441419794475810549
 Rigidbody2D:
@@ -345,10 +345,10 @@ MonoBehaviour:
   m_Script: {fileID: -410691123, guid: 01701b64234b4d523d8045142cbc73fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FixedSendsPerSecond: 40
+  FixedSendsPerSecond: 120
   AssumeSyncedSends: 1
   InterpolatePosition: 1
-  SnapDistance: 2
+  SnapDistance: 0.5
   InterpolateServer: 1
   MinMeters: 0.15
   MinDegrees: 1.5

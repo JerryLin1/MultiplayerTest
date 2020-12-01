@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public class Bullet : MonoBehaviour
+using MLAPI;
+using MLAPI.Messaging;
+public class Bullet : NetworkedBehaviour
 {
     float lifeSpan = 2;
     public string ownerName;
@@ -18,6 +20,7 @@ public class Bullet : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    [ServerRPC]
     public void Fired(string ownerName, float speed, Vector3 direction) {
         GetComponent<Rigidbody2D>().velocity = direction*speed;
         this.ownerName = ownerName;

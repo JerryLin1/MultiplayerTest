@@ -2103,7 +2103,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 8.02
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -5635,7 +5635,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1152095873}
   - component: {fileID: 1152095872}
-  - component: {fileID: 1152095874}
   - component: {fileID: 1152095871}
   m_Layer: 0
   m_Name: Network
@@ -5653,11 +5652,72 @@ MonoBehaviour:
   m_GameObject: {fileID: 1152095870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08dc441066dd51643983638dca47075e, type: 3}
+  m_Script: {fileID: -2103117103, guid: 3008156af8bd8584093f8120f3ebd724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConnectToSteamID: 76561198284178554
-  UserChannels: []
+  ConnectAddress: 127.0.0.1
+  Port: 7777
+  Channels: []
+  TransportBufferSize: 8192
+  LogLevel: 1
+  EnableSyncronizationEvent: 0
+  EnableSyncronizedCallbacks: 0
+  EventQueueSize: 8192
+  ProcessingQueueSize: 8192
+  HeapPointersPoolSize: 1024
+  HeapMemoryPoolSize: 1024
+  MemoryWrapperPoolSize: 1024
+  ChannelPoolSize: 1024
+  PooledChannels: -1
+  UseIPv6Dual: 1
+  AllowUnconnectedMessages: 0
+  AllowBroadcasts: 0
+  EnableAckNotifications: 0
+  LogicDelay: 50
+  ReuseChannels: 1
+  LogicThreads: 1
+  SocketThreads: 1
+  ProcessingThreads: 0
+  MaxMergeMessageSize: 1024
+  MaxMergeDelay: 15
+  EnableMergedAcks: 1
+  MergedAckBytes: 8
+  MaximumMTU: 4096
+  MinimumMTU: 512
+  EnablePathMTU: 1
+  MaxMTUAttempts: 8
+  MTUAttemptDelay: 1000
+  MTUGrowthFactor: 1.25
+  MaxFragments: 512
+  MaxBufferSize: 5120
+  HandshakeTimeout: 20000
+  ConnectionTimeout: 20000
+  HeartbeatDelay: 5000
+  HandshakeResendDelay: 500
+  MaxHandshakeResends: 20
+  ConnectionRequestMinResendDelay: 500
+  MaxConnectionRequestResends: 5
+  ConnectionRequestTimeout: 5000
+  ChallengeDifficulty: 20
+  ConnectionChallengeHistory: 2048
+  ConnectionChallengeTimeWindow: 300
+  TimeBasedConnectionChallenge: 1
+  AmplificationPreventionHandshakePadding: 512
+  ReliabilityWindowSize: 512
+  ReliableAckFlowWindowSize: 1024
+  ReliabilityMaxResendAttempts: 30
+  ReliabilityResendRoundtripMultiplier: 1.2
+  ReliabilityMinPacketResendDelay: 100
+  ReliabilityMinAckResendDelay: 100
+  UseSimulator: 0
+  DropPercentage: 0.1
+  MaxLatency: 100
+  MinLatency: 30
+  EnableHeartbeats: 1
+  EnableTimeouts: 1
+  EnableChannelUpdates: 1
+  EnableConnectionRequestResends: 1
+  EnablePacketMerging: 1
 --- !u!114 &1152095872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5683,6 +5743,9 @@ MonoBehaviour:
     - Prefab: {fileID: 6441419794475810551, guid: 43fc346cfb66fcf478d231c12ac292e2,
         type: 3}
       PlayerPrefab: 1
+    - Prefab: {fileID: 8432216660474627141, guid: 57106a1f515fcd44aaa4134a962a6469,
+        type: 3}
+      PlayerPrefab: 0
     PlayerPrefabHash:
       Value: 1897319656204293034
     CreatePlayerPrefab: 1
@@ -5725,29 +5788,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1152095874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1152095870}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -293339658, guid: 1a8bd012858c3c44ca02c604f359882c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Port: 7777
-  Address: 127.0.0.1
-  PingInterval: 1
-  DisconnectTimeout: 5
-  ReconnectDelay: 0.5
-  MaxConnectAttempts: 10
-  channels: []
-  MessageBufferSize: 5120
-  SimulatePacketLossChance: 0
-  SimulateMinLatency: 0
-  SimulateMaxLatency: 0
 --- !u!1 &1185342716
 GameObject:
   m_ObjectHideFlags: 0

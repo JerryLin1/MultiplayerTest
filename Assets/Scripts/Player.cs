@@ -17,8 +17,8 @@ public class Player : NetworkedBehaviour
     private Rigidbody2D rb;
     private Vector2 direction;
     private Vector3 playerMousePos;
-    private static NetworkedVarSettings nvsOwner = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.OwnerOnly};
-    private static NetworkedVarSettings nvsEveryone = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone};
+    private static NetworkedVarSettings nvsOwner = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.OwnerOnly };
+    private static NetworkedVarSettings nvsEveryone = new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone };
     private NetworkedVarFloat haxis = new NetworkedVarFloat(nvsOwner);
     private float vaxis;
     private float bulletSpeed = 30f;
@@ -67,20 +67,13 @@ public class Player : NetworkedBehaviour
         }
         gunCDElapsed -= Time.deltaTime;
     }
-
     [ServerRPC]
     void SpawnBullet(string username, float bulletSpeed, Vector3 direction)
     {
-        // GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
-        // IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
-        InvokeClientRpcOnEveryone(SpawnBulletClient, username, bulletSpeed, direction.normalized);
-    }
-    // wtf is this this is not right bro
-    [ClientRPC]
-    void SpawnBulletClient(string username, float bulletSpeed, Vector3 direction)
-    {
         GameObject IbulletPrefab = Instantiate(bulletPrefab, hand.position, Quaternion.identity);
-        IbulletPrefab.GetComponent<Bullet>().Fired(username, bulletSpeed, direction.normalized);
+        IbulletPrefab.GetComponent<NetworkedObject>().Spawn();
+        Bullet Ib = IbulletPrefab.GetComponent<Bullet>();
+        Ib.InvokeServerRpc(Ib.Fired, username, bulletSpeed, direction);
     }
     void PointTowardsCursor()
     {

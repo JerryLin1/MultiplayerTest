@@ -18,10 +18,12 @@ public class UIManager : NetworkedBehaviour
     private Transform scoreboard;
     private NetworkedDictionary<string, int> ScoreTracker = new NetworkedDictionary<string, int>(nvsEveryone);
     private List<ulong> clientIdList = new List<ulong>();
+    SteamP2PTransport.SteamP2PTransport steamTransport;
     private void Start()
     {
         scoreboard = transform.Find("Scoreboard");
         scoreboard.gameObject.SetActive(false);
+        steamTransport = GameObject.Find("Network").GetComponent<SteamP2PTransport.SteamP2PTransport>();
     }
     public void StartHost()
     {
@@ -31,7 +33,6 @@ public class UIManager : NetworkedBehaviour
     public void StartClient()
     {
         string idstring = gameObject.transform.Find("Buttons").Find("SteamID").GetComponent<TMP_InputField>().text;
-        SteamP2PTransport.SteamP2PTransport steamTransport = GameObject.Find("Network").GetComponent<SteamP2PTransport.SteamP2PTransport>();
         if (steamTransport != null) steamTransport.ConnectToSteamID = ulong.Parse(idstring);
         NetworkingManager.Singleton.StartClient();
         StartGame();
